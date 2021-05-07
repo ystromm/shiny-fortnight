@@ -1,5 +1,7 @@
 #
 
+Build a simple API using and S3 bucket as the storage.
+
 ##
 
 Makefile:
@@ -34,9 +36,13 @@ curl localhost:8080/healthcheck
 A test:
 
 ```
-
+...
 ```
 
+Factory function to create server:
+
+```
+```
 
 ## List files
 
@@ -46,6 +52,38 @@ boto3==1.17.*
 ```
 
 Test:
+
+```
+...
+```
+
+## Get a single file
+
+Test:
+
+```
+...
+```
+
+## Upload and validate
+
+```sh
+curl --XPUT localhost:8080/schema/test?validate=true -D ...
+```
+Test:
+```
+...
+```
+
+JSON schema:
+
+```
+```
+
+requirements.txt:
+```
+jsonschema==3.2.0
+```
 
 
 
