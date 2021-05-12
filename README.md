@@ -95,16 +95,101 @@ if __name__ == "__main__":
 
 ## List files
 
+Let's start with a test:
+
+````python
+def test_get_schema_returns_empty_list():
+    server_under_test = server_factory()
+    request, response = server_under_test.test_client.get('/schema')
+    assert response.status == 200
+    assert response.json == []
+````
+
+And the naive implementation:
+
+````python
+    @sanic.get("/schema")
+    async def list_schemas(request):
+        return json([])
+````
+
+To do a real implementation we need a boto3 client:
+
 requirements.txt:
-```
+
+```text
 boto3==1.17.*
 ```
 
-Test:
+Get schemas should call list_objects:
 
+```python
+def test_get_schema_should_list_objects():
+    server_under_test, s3 = server_factory()
+    request, response = server_under_test.test_client.get('/schema')
+    s3.list_objects_v2.assert_called_with(Bucket="funnel-data-schema-stage")
+    assert response.status == 200
 ```
-...
+
+To allow for tests we need to add the s3 client as a parameter:
+
+```python
+from unittest.mock import MagicMock
+
+def server_factory():
+    s3 = MagicMock()
+    server_under_test = server(s3)
+    TestManager(server_under_test)
+    return server_under_test, s3
 ```
+
+Update factory method and entry point:
+
+```python
+def server(s3):
+
+    @sanic.get("/schema")
+    async def list_schemas(request):
+        list_objects_v2 = s3.list_objects_v2(Bucket="funnel-data-schema-stage")
+        return json([])
+
+if __name__ == "__main__":
+    server(boto3.client("s3")).run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+```
+
+Test to simulate actual data:
+
+```python
+def test_get_schema_should_list_objects():
+    server_under_test, s3 = server_factory()
+    s3.list_objects_v2.return_value = {
+        'Contents': [
+            {
+                'Key': 'a.json'
+            },
+            {
+                'Key': 'b.json'
+            }
+        ]
+    }
+    request, response = server_under_test.test_client.get('/schema')
+    s3.list_objects_v2.assert_called_with(Bucket="funnel-data-schema-stage")
+    assert response.status == 200
+    assert response.json == ["a", "b"]
+```
+
+And transform the response:
+
+```python
+    @sanic.get("/schema")
+    async def list_schemas(request):
+        list_objects_v2 = s3.list_objects_v2(Bucket="funnel-data-schema-stage")
+        keys = [list_object["Key"] for list_object in list_objects_v2["Contents"]]
+        keys_without_json = [key_json[:-5] for key_json in keys]
+        return json(keys_without_json)
+```
+
+What about files with other extensions? 
 
 ## Get a single file
 
