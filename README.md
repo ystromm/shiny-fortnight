@@ -1,6 +1,6 @@
 # shiny-forthnight
 
-Build a simple API using and S3 bucket as the storage.
+Build a simple API using an S3 bucket as the storage.
 
 ## Some basic stuff
 
