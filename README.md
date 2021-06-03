@@ -68,7 +68,6 @@ test/test_server.py:
 ```python
 def server_factory():
     server_under_test = server()
-    TestManager(server_under_test)
     return server_under_test
 ```
 
@@ -84,6 +83,8 @@ def server():
     @sanic.get("/healthcheck")
     async def healthcheck(request):
         return json({"alive": "kicking"})
+
+    return sanic
 ```
 
 Entry point: 
