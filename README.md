@@ -18,7 +18,7 @@ setup: venv
 
 .PHONY: test
 test: setup
-	@ . venv/bin/activate && PYTHONPATH=src pytest test && flake8 src --exclude '#*,~*,.#*'
+	@ . venv/bin/activate && PYTHONPATH=src pytest test'
 
 clean:
 	rm -rf venv
