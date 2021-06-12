@@ -78,13 +78,13 @@ Create the server in a factory method.
 from sanic import Sanic, json
 
 def server():
-    sanic = Sanic("api")
+    app = Sanic("api")
 
-    @sanic.get("/healthcheck")
+    @app.get("/healthcheck")
     async def healthcheck(request):
-        return json({"alive": "kicking"})
-
-    return sanic
+        return json({"status": "ok"})
+    
+    return app
 ```
 
 Entry point: 
@@ -109,7 +109,7 @@ def test_get_schema_returns_empty_list():
 And the naive implementation:
 
 ````python
-    @sanic.get("/schema")
+    @app.get("/schema")
     async def list_schemas(request):
         return json([])
 ````
@@ -128,7 +128,7 @@ Get schemas should call list_objects:
 def test_get_schema_should_list_objects():
     server_under_test, s3 = server_factory()
     request, response = server_under_test.test_client.get('/schema')
-    s3.list_objects_v2.assert_called_with(Bucket="funnel-data-schema-stage")
+    s3.list_objects_v2.assert_called_with(Bucket="shiny-forthnight")
     assert response.status == 200
 ```
 
@@ -147,11 +147,13 @@ def server_factory():
 Update factory method and entry point:
 
 ```python
+BUCKET="shiny-forthnight"
+
 def server(s3):
 
-    @sanic.get("/schema")
+    @app.get("/schema")
     async def list_schemas(request):
-        list_objects_v2 = s3.list_objects_v2(Bucket="funnel-data-schema-stage")
+        list_objects_v2 = s3.list_objects_v2(Bucket="BUCKET)
         return json([])
 
 if __name__ == "__main__":
@@ -174,7 +176,7 @@ def test_get_schema_should_list_objects():
         ]
     }
     request, response = server_under_test.test_client.get('/schema')
-    s3.list_objects_v2.assert_called_with(Bucket="funnel-data-schema-stage")
+    s3.list_objects_v2.assert_called_with(Bucket="shiny-forthnight")
     assert response.status == 200
     assert response.json == ["a", "b"]
 ```
@@ -182,9 +184,9 @@ def test_get_schema_should_list_objects():
 And transform the response:
 
 ```python
-    @sanic.get("/schema")
+    @app.get("/schema")
     async def list_schemas(request):
-        list_objects_v2 = s3.list_objects_v2(Bucket="funnel-data-schema-stage")
+        list_objects_v2 = s3.list_objects_v2(Bucket=BUCKET)
         keys = [list_object["Key"] for list_object in list_objects_v2["Contents"]]
         keys_without_json = [key_json[:-5] for key_json in keys]
         return json(keys_without_json)
@@ -219,6 +221,46 @@ requirements.txt:
 ```
 jsonschema==3.2.0
 ```
+
+## Deploy
+
+Dockerfile:
+
+```docker
+FROM python:3.8
+WORKDIR /app
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
+COPY src .
+CMD python3 server.py
+```
+
+Makefile:
+```
+ .PHONY: build
+build:
+	docker build --tag shiny-forthnight .
+```
+
+```shell
+docker run -p8080:8080 shiny-forthnight
+```
+
+
+
+## openapi
+
+requirements.txt:
+```
+sanic-openapi==21.*
+```
+
+server.py:
+```
+
+```
+
+
 
 
 

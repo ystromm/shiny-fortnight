@@ -11,6 +11,14 @@ setup: venv
 test: setup
 	@ . venv/bin/activate && PYTHONPATH=src pytest test && flake8 src --exclude '#*,~*,.#*'
 
+ .PHONY: serve
+serve: setup
+	@ . venv/bin/activate && PYTHONPATH=src && python3 src/server.py
+
+ .PHONY: build
+build:
+	docker build --tag shiny-forthnight .
+
 clean:
 	rm -rf venv
 	rm -rf dist
