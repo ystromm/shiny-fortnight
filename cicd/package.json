@@ -1,0 +1,15 @@
+{
+  "name": "shiny-forthnight-cicd",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "serverless deploy ",
+    "remove": "serverless remove "
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "serverless": "^2.46.0"
+  }
+}
