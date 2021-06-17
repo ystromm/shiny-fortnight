@@ -1,4 +1,5 @@
 SHELL=bash
+COMMIT := $(shell git rev-parse --short HEAD)
 
 venv: requirements-dev.txt
 	(python3.8 -m venv venv && \
@@ -17,7 +18,8 @@ serve: setup
 
  .PHONY: build
 build:
-	docker build --tag shiny-forthnight .
+	echo $(COMMIT)
+	docker build --tag ystromm/shiny-forthnight --tag ystromm/shiny-forthnight:$(COMMIT) .
 
 clean:
 	rm -rf venv
