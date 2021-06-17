@@ -12,14 +12,19 @@ setup: venv
 test: setup
 	@ . venv/bin/activate && PYTHONPATH=src pytest test && flake8 src --exclude '#*,~*,.#*'
 
- .PHONY: serve
+.PHONY: serve
 serve: setup
 	@ . venv/bin/activate && PYTHONPATH=src && python3 src/server.py
 
- .PHONY: build
+.PHONY: build
 build:
 	echo $(COMMIT)
-	docker build --tag ystromm/shiny-forthnight --tag ystromm/shiny-forthnight:$(COMMIT) .
+	docker build --tag 625185193489.dkr.ecr.eu-north-1.amazonaws.com/ystromm/shiny-forthnight --tag 625185193489.dkr.ecr.eu-north-1.amazonaws.com/ystromm/shiny-forthnight:$(COMMIT) .
+
+.PHONY: push
+push:
+	echo $(COMMIT)
+	docker push 625185193489.dkr.ecr.eu-north-1.amazonaws.com/ystromm/shiny-forthnight
 
 clean:
 	rm -rf venv

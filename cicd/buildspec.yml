@@ -8,3 +8,4 @@ phases:
   build:
     commands:
       - make build
+      - make push
