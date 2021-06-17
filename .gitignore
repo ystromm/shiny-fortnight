@@ -127,4 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# IntelliJ
 .idea
+
+# node.js
+node_modules/
+
+# Serverless
+.serverless/
