@@ -5,7 +5,7 @@ import boto3
 from sanic import Sanic, json
 from sanic.response import raw, empty
 
-BUCKET = "shiny-forthnight"
+BUCKET = "ystromm-shiny-forthnight"
 
 
 def server(s3):
